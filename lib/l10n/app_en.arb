@@ -1,0 +1,20 @@
+{
+  "@@locale": "en",
+  "ok": "Ok",
+  "cancel": "Cancel",
+  "close": "Close",
+
+  "visitors_basic_info": "Basic information of visitors",
+  "report_screen": "Report screen",
+  "before_visitors": "Number of visitors so far",
+  "current_visitors": "Current venue capacity",
+  "viewing_area": "Viewing the area",
+  "under_negotiation": "Under negotiation",
+  "reservations_today": "Today's reservations",
+  "reservations_left": "Reservations left",
+  "monthly_visitors": "Monthly visitors「Year @」",
+  "first_time_visitors": "First-time visitors",
+  "non_first_time_visitors": "Non-first-time visitors",
+  "count": "...",
+  "subject": "..."
+}
