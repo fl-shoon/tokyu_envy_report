@@ -6,15 +6,15 @@
 
   "visitors_basic_info": "来場者の基本情報",
   "report_screen": "報告画面",
-  "before_visitors": "今までの来場者数",
-  "current_visitors": "今の会場収容者数",
+  "today_visitors": "本日の来場者数",
+  "last_month_visitors": "先月の来場者数",
   "viewing_area": "エリア観覧中",
   "under_negotiation": "商談中",
   "reservations_today": "本日の予約件数",
   "reservations_left": "残りの来場予定件数",
   "monthly_visitors": "月ごとの来場者数推移「@ 年」",
-  "first_time_visitors": "初回来客の数",
-  "non_first_time_visitors": "初回ではない来客の数",
+  "first_time_visitors": "初回",
+  "non_first_time_visitors": "初回ではない",
   "count": "名",
   "subject": "件"
 }

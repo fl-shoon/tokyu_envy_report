@@ -18,11 +18,11 @@ class AxisWidget extends StatelessWidget {
   const AxisWidget(
       {super.key,
       required this.topTitle,
-      this.topTitleFontSize = 14,
+      this.topTitleFontSize = 16,
       required this.leftTitle,
-      this.leftTitleFontSize = 8,
+      this.leftTitleFontSize = 12,
       required this.rightTitle,
-      this.rightTitleFontSize = 8,
+      this.rightTitleFontSize = 12,
       required this.topVisitorCountNumber,
       required this.topVisitorCountText,
       required this.leftVisitorCountNumber,
@@ -32,13 +32,14 @@ class AxisWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final style = Style.of(context);
 
     return Container(
-      height: 170,
-      width: 170,
+      height: 180,
+      width: 200,
       decoration: BoxDecoration(
-          border: Border.all(width: 1, color: Colors.white.withOpacity(0.7)), borderRadius: BorderRadius.circular(5)),
+          border: Border.all(width: 1, color: theme.colorScheme.outline), borderRadius: BorderRadius.circular(5)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -79,7 +80,7 @@ class AxisWidget extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Container(
-                padding: const EdgeInsets.only(top: 20, bottom: 20),
+                padding: const EdgeInsets.only(top: 25, bottom: 25),
                 color: Colors.white.withOpacity(0.7),
                 child: const VerticalDivider(width: 2),
               ),

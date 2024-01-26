@@ -123,17 +123,17 @@ abstract class L10n {
   /// **'Report screen'**
   String get report_screen;
 
-  /// No description provided for @before_visitors.
+  /// No description provided for @today_visitors.
   ///
   /// In en, this message translates to:
-  /// **'Number of visitors so far'**
-  String get before_visitors;
+  /// **'Today\'s visitors'**
+  String get today_visitors;
 
-  /// No description provided for @current_visitors.
+  /// No description provided for @last_month_visitors.
   ///
   /// In en, this message translates to:
-  /// **'Current venue capacity'**
-  String get current_visitors;
+  /// **'Last month\'s visitors'**
+  String get last_month_visitors;
 
   /// No description provided for @viewing_area.
   ///
@@ -168,13 +168,13 @@ abstract class L10n {
   /// No description provided for @first_time_visitors.
   ///
   /// In en, this message translates to:
-  /// **'First-time visitors'**
+  /// **'First-time'**
   String get first_time_visitors;
 
   /// No description provided for @non_first_time_visitors.
   ///
   /// In en, this message translates to:
-  /// **'Non-first-time visitors'**
+  /// **'Non-first-time'**
   String get non_first_time_visitors;
 
   /// No description provided for @count.

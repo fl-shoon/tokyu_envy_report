@@ -4,40 +4,40 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tokyu_envy_report/components/report/legend_widget.dart';
 import 'package:tokyu_envy_report/etc/style.dart';
 import 'package:tokyu_envy_report/l10n/l10n.dart';
-import 'package:tokyu_envy_report/state/state_model.dart';
 import 'package:tokyu_envy_report/state/state_visitor.dart';
+
+List<BarChartGroupData> _generate(WidgetRef ref) {
+  final List<BarChartGroupData> barGroups = [];
+  const barsWidth = 15.00;
+  const barsSpace = 10.00;
+
+  List.filled(12, 1).asMap().forEach((key, value) {
+    final visitors = ref.watch(visitorHistory(DateTime(DateTime.now().year - 1, key + 1).toIso8601String()));
+    final firstTimers = visitors.where((element) => element.isFirstTime).toList();
+    final nonFirstTimers = visitors.where((element) => !element.isFirstTime).toList();
+    barGroups.add(BarChartGroupData(x: key + 1, barsSpace: barsSpace, barRods: [
+      BarChartRodData(
+          toY: visitors.length.toDouble(),
+          borderRadius: BorderRadius.zero,
+          width: barsWidth,
+          rodStackItems: [
+            BarChartRodStackItem(0, firstTimers.length.toDouble(), Colors.greenAccent),
+            BarChartRodStackItem(firstTimers.length.toDouble(), (nonFirstTimers.length + firstTimers.length).toDouble(),
+                const Color(0xFF484039))
+          ])
+    ]));
+  });
+  return barGroups;
+}
 
 class VisitorByMonth extends ConsumerWidget {
   const VisitorByMonth({super.key = const Key('s_visitor_by_month')});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    List<BarChartGroupData> barGroups = [];
-    List<Visitor> firstTimers = [];
-    List<Visitor> nonFirstTimers = [];
-
     final l10n = L10n.of(context)!;
     final theme = Theme.of(context);
     final style = Style.of(context);
-    const barsSpace = 5.00;
-    const barsWidth = 10.00;
-
-    List.filled(12, 1).asMap().forEach((key, value) {
-      final visitors = ref.watch(visitorHistory(DateTime(2023, key + 1).toIso8601String()));
-      firstTimers = visitors.where((element) => element.isFirstTime).toList();
-      nonFirstTimers = visitors.where((element) => !element.isFirstTime).toList();
-      barGroups.add(BarChartGroupData(x: key + 1, barsSpace: barsSpace, barRods: [
-        BarChartRodData(
-            toY: visitors.length.toDouble(),
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-            rodStackItems: [
-              BarChartRodStackItem(0, firstTimers.length.toDouble(), Colors.greenAccent),
-              BarChartRodStackItem(firstTimers.length.toDouble(),
-                  (nonFirstTimers.length + firstTimers.length).toDouble(), const Color(0xFF484039))
-            ])
-      ]));
-    });
 
     Widget bottomTitles(double value, TitleMeta meta) {
       return SideTitleWidget(
@@ -55,7 +55,7 @@ class VisitorByMonth extends ConsumerWidget {
         children: [
           const SizedBox(height: 8),
           Text(
-            l10n.monthly_visitors.replaceAll('@', '2023'),
+            l10n.monthly_visitors.replaceAll('@', (DateTime.now().year - 1).toString()),
             style: style.graphMainTitle,
           ),
           const SizedBox(height: 8),
@@ -67,15 +67,14 @@ class VisitorByMonth extends ConsumerWidget {
           ),
           const SizedBox(height: 14),
           Container(
-            width: 400,
-            height: 200,
+            width: 450,
+            height: 250,
             padding: const EdgeInsets.all(12),
             color: theme.cardColor.withOpacity(0.7),
             child: BarChart(BarChartData(
               alignment: BarChartAlignment.center,
               barTouchData: BarTouchData(enabled: false),
-              borderData:
-                  FlBorderData(show: true, border: Border.all(width: 2.0, color: Colors.white.withOpacity(0.4))),
+              borderData: FlBorderData(show: true, border: Border.all(width: 2.0, color: theme.colorScheme.outline)),
               titlesData: FlTitlesData(
                   show: true,
                   topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -98,7 +97,7 @@ class VisitorByMonth extends ConsumerWidget {
                 horizontalInterval: 1,
                 checkToShowHorizontalLine: (value) => value % 2 == 0,
               ),
-              barGroups: barGroups,
+              barGroups: _generate(ref),
             )),
           )
         ],

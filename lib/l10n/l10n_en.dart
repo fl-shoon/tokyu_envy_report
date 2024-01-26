@@ -20,10 +20,10 @@ class L10nEn extends L10n {
   String get report_screen => 'Report screen';
 
   @override
-  String get before_visitors => 'Number of visitors so far';
+  String get today_visitors => 'Today\'s visitors';
 
   @override
-  String get current_visitors => 'Current venue capacity';
+  String get last_month_visitors => 'Last month\'s visitors';
 
   @override
   String get viewing_area => 'Viewing the area';
@@ -41,10 +41,10 @@ class L10nEn extends L10n {
   String get monthly_visitors => 'Monthly visitors「Year @」';
 
   @override
-  String get first_time_visitors => 'First-time visitors';
+  String get first_time_visitors => 'First-time';
 
   @override
-  String get non_first_time_visitors => 'Non-first-time visitors';
+  String get non_first_time_visitors => 'Non-first-time';
 
   @override
   String get count => '...';

@@ -49,6 +49,11 @@ class Style {
     fontSize: 14,
     fontWeight: FontWeight.bold,
   );
+  final TextStyle graphMediumTitle = const TextStyle(
+    color: Color(0xFFD6D6D6),
+    fontSize: 17,
+    fontWeight: FontWeight.bold,
+  );
   final TextStyle graphTitles = const TextStyle(
     color: Color(0xFFFAFAFA),
     fontSize: 11,
@@ -57,15 +62,21 @@ class Style {
   );
   final TextStyle visitorCountLarge = const TextStyle(
     color: Color(0xFFFAFAFA),
-    fontSize: 28,
+    fontSize: 35,
   );
   final TextStyle visitorCountSmall = const TextStyle(
     color: Color(0xFFFAFAFA),
-    fontSize: 20,
+    fontSize: 25,
   );
   final TextStyle visitorCountText = const TextStyle(
     color: Color(0xFFFAFAFA),
+    fontSize: 16,
+  );
+  final TextStyle pieChartTitleText = const TextStyle(
     fontSize: 12,
+    fontWeight: FontWeight.bold,
+    color: Colors.white,
+    shadows: [Shadow(color: Colors.black, blurRadius: 2)],
   );
 
   static Style of(BuildContext context) {

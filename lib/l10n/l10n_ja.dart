@@ -20,10 +20,10 @@ class L10nJa extends L10n {
   String get report_screen => '報告画面';
 
   @override
-  String get before_visitors => '今までの来場者数';
+  String get today_visitors => '本日の来場者数';
 
   @override
-  String get current_visitors => '今の会場収容者数';
+  String get last_month_visitors => '先月の来場者数';
 
   @override
   String get viewing_area => 'エリア観覧中';
@@ -41,10 +41,10 @@ class L10nJa extends L10n {
   String get monthly_visitors => '月ごとの来場者数推移「@ 年」';
 
   @override
-  String get first_time_visitors => '初回来客の数';
+  String get first_time_visitors => '初回';
 
   @override
-  String get non_first_time_visitors => '初回ではない来客の数';
+  String get non_first_time_visitors => '初回ではない';
 
   @override
   String get count => '名';
