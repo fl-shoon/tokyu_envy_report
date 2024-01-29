@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:tokyu_envy_report/etc/define.dart';
 
-class QuestionsTable extends StatelessWidget {
-  const QuestionsTable({super.key});
+class PropertiesTable extends StatelessWidget {
+  final List<String> properties;
+  const PropertiesTable({super.key, required this.properties});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final tableHeader = ['表示する名前', 'アンケートの質問'];
+    final tableHeader = ['表示する名前', '物件名'];
 
     return Container(
         width: 400,
@@ -35,23 +35,22 @@ class QuestionsTable extends StatelessWidget {
                 );
               }).toList(),
             ),
-            ...List.generate(questions.length, (index) {
+            ...List.generate(properties.length, (index) {
               return TableRow(
                   decoration: const BoxDecoration(
                     border: Border.symmetric(vertical: BorderSide.none),
-                    // color: Colors.amber
                   ),
                   children: [
                     TableCell(
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text('質問${index + 1}'),
+                        child: Text('物件${index + 1}'),
                       ),
                     ),
                     TableCell(
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text(questions[index]),
+                        child: Text(properties[index]),
                       ),
                     ),
                   ]);

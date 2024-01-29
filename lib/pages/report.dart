@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tokyu_envy_report/components/report/axis_widget.dart';
-import 'package:tokyu_envy_report/components/survey/questions_table.dart';
+import 'package:tokyu_envy_report/components/survey/question_table.dart';
 import 'package:tokyu_envy_report/etc/define.dart';
 import 'package:tokyu_envy_report/l10n/l10n.dart';
-import 'package:tokyu_envy_report/pages/graph/survey/question.dart';
+import 'package:tokyu_envy_report/pages/box/box.dart';
+import 'package:tokyu_envy_report/pages/graph/property.dart';
 import 'package:tokyu_envy_report/pages/graph/visitor.dart';
+import 'package:tokyu_envy_report/pages/pie/pie.dart';
 import 'package:tokyu_envy_report/state/state_model.dart';
 import 'package:tokyu_envy_report/state/state_visitor.dart';
 
@@ -14,21 +15,20 @@ final _visitors = StateProvider.family.autoDispose((ref, String dt) {
   return visitors;
 });
 
-final _firstTimers = StateProvider.family
-    .autoDispose((ref, List<Visitor> visitors) => visitors.where((element) => element.isFirstTime).toList());
-final _nonFirstTimers = StateProvider.family
-    .autoDispose((ref, List<Visitor> visitors) => visitors.where((element) => !element.isFirstTime).toList());
-
 bool _surveryCheck(List<Visitor> visitors) {
-  bool passed = false;
-  int len = 0;
+  if (visitors.isEmpty) return false;
 
-  if (visitors.isEmpty) return passed;
-  List.generate(visitors.length, (index) {
-    len = visitors[index].afterAnswers.length;
-    if (index > 0 && visitors[index].afterAnswers.length == len) passed = true;
+  int len = visitors.first.afterAnswers.length;
+  final List<bool> boolList = [];
+
+  visitors.asMap().forEach((index, visitor) {
+    if (index > 0) {
+      boolList.add(len == visitor.afterAnswers.length);
+      len = visitor.afterAnswers.length;
+    }
   });
-  return passed;
+
+  return boolList.every((element) => element == true);
 }
 
 class SRport extends ConsumerWidget {
@@ -36,21 +36,18 @@ class SRport extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final now = DateTime.now();
     final l10n = L10n.of(context)!;
     final theme = Theme.of(context);
-    final dtNow = DateTime.now();
+    final mq = MediaQuery.of(context);
+    final width = mq.size.width;
 
-    final todayVisitors = ref.watch(_visitors(DateTime(dtNow.year, dtNow.month, dtNow.day).toIso8601String()));
-    final todayFirstTimers = ref.watch(_firstTimers(todayVisitors));
-    final todayNonFirstTimers = ref.watch(_nonFirstTimers(todayVisitors));
-
-    final lastMonthVisitors = ref.watch(_visitors(DateTime(dtNow.year, dtNow.month - 1).toIso8601String()));
-    final lastMonthFirstTimers = ref.watch(_firstTimers(lastMonthVisitors));
-    final lastMonthNonFirstTimers = ref.watch(_nonFirstTimers(lastMonthVisitors));
+    final todayVisitors = ref.watch(_visitors(DateTime(now.year, now.month, now.day).toIso8601String()));
+    final lastMonthVisitors = ref.watch(_visitors(DateTime(now.year, now.month - 1).toIso8601String()));
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.report_screen),
+        title: Text(l10n.report_screen, style: theme.textTheme.titleLarge),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -59,69 +56,23 @@ class SRport extends ConsumerWidget {
             children: [
               const SizedBox(height: 20),
               Text(l10n.visitors_basic_info,
-                  style: theme.textTheme.titleLarge!.copyWith(decoration: TextDecoration.underline)),
+                  style: theme.textTheme.titleLarge!
+                      .copyWith(decoration: TextDecoration.underline, fontWeight: FontWeight.bold, fontSize: 22)),
               const SizedBox(height: 40),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  AxisWidget(
-                      topTitle: l10n.today_visitors,
-                      leftTitle: l10n.first_time_visitors,
-                      rightTitle: l10n.non_first_time_visitors,
-                      topVisitorCountNumber: todayVisitors.length.toString(),
-                      topVisitorCountText: l10n.count,
-                      leftVisitorCountNumber: todayFirstTimers.length.toString(),
-                      leftVisitorCountText: l10n.count,
-                      rightVisitorCountNumber: todayNonFirstTimers.length.toString(),
-                      rightVisitorCountText: l10n.count),
-                  const SizedBox(width: 50),
-                  AxisWidget(
-                      topTitle: l10n.last_month_visitors,
-                      leftTitle: l10n.first_time_visitors,
-                      rightTitle: l10n.non_first_time_visitors,
-                      topVisitorCountNumber: lastMonthVisitors.length.toString(),
-                      topVisitorCountText: l10n.count,
-                      leftVisitorCountNumber: lastMonthFirstTimers.length.toString(),
-                      leftVisitorCountText: l10n.count,
-                      rightVisitorCountNumber: lastMonthNonFirstTimers.length.toString(),
-                      rightVisitorCountText: l10n.count),
-                ],
-              ),
+              VisitorInfoBox(todayVisitors: todayVisitors, lastMonthVisitors: lastMonthVisitors),
               const SizedBox(height: 20),
               const VisitorByMonth(),
-              const SizedBox(height: 40),
-              Text('先月のアンケート分析', style: theme.textTheme.titleLarge!.copyWith(decoration: TextDecoration.underline)),
               const SizedBox(height: 20),
-              if (_surveryCheck(lastMonthVisitors)) ...[
+              const VisitorByProperty(),
+              const SizedBox(height: 40),
+              Text('先月のアンケート分析',
+                  style: theme.textTheme.titleLarge!
+                      .copyWith(decoration: TextDecoration.underline, fontWeight: FontWeight.bold, fontSize: 22)),
+              const SizedBox(height: 20),
+              if (_surveryCheck(lastMonthVisitors) && questions.isNotEmpty) ...[
                 const QuestionsTable(),
                 const SizedBox(height: 10),
-                ...List.generate(questions.length, (index) {
-                  final check = lastMonthVisitors.first.afterAnswers.length == questions.length;
-
-                  if (check) {
-                    if ((index % 2) == 0) {
-                      return Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            SurveyQuestionPieChart(
-                                visitors: lastMonthVisitors, title: '質問${index + 1}', questionIndex: index),
-                            SurveyQuestionPieChart(
-                                visitors: lastMonthVisitors, title: '質問${index + 2}', questionIndex: index + 1)
-                          ]);
-                    } else {
-                      if ((index + 1).isOdd && (index + 1) == questions.length) {
-                        return SurveyQuestionPieChart(
-                            visitors: lastMonthVisitors, title: '質問${index + 1}', questionIndex: index);
-                      } else {
-                        return Container();
-                      }
-                    }
-                  } else {
-                    return Container();
-                  }
-                }),
+                SurveyPieWidget(visitors: lastMonthVisitors, width: width),
               ],
               const SizedBox(height: 20)
             ],

@@ -6,20 +6,19 @@ import 'package:tokyu_envy_report/etc/style.dart';
 import 'package:tokyu_envy_report/l10n/l10n.dart';
 import 'package:tokyu_envy_report/state/state_visitor.dart';
 
-List<BarChartGroupData> _generate(WidgetRef ref) {
+List<BarChartGroupData> _generate(WidgetRef ref, double width) {
   final List<BarChartGroupData> barGroups = [];
-  const barsWidth = 15.00;
-  const barsSpace = 10.00;
+  final setWidth = width > 1000 ? (width / 50) - 5 : width / 50;
 
   List.filled(12, 1).asMap().forEach((key, value) {
     final visitors = ref.watch(visitorHistory(DateTime(DateTime.now().year - 1, key + 1).toIso8601String()));
     final firstTimers = visitors.where((element) => element.isFirstTime).toList();
     final nonFirstTimers = visitors.where((element) => !element.isFirstTime).toList();
-    barGroups.add(BarChartGroupData(x: key + 1, barsSpace: barsSpace, barRods: [
+    barGroups.add(BarChartGroupData(x: key + 1, barsSpace: width / 50, barRods: [
       BarChartRodData(
           toY: visitors.length.toDouble(),
           borderRadius: BorderRadius.zero,
-          width: barsWidth,
+          width: setWidth,
           rodStackItems: [
             BarChartRodStackItem(0, firstTimers.length.toDouble(), Colors.greenAccent),
             BarChartRodStackItem(firstTimers.length.toDouble(), (nonFirstTimers.length + firstTimers.length).toDouble(),
@@ -38,6 +37,8 @@ class VisitorByMonth extends ConsumerWidget {
     final l10n = L10n.of(context)!;
     final theme = Theme.of(context);
     final style = Style.of(context);
+    final mq = MediaQuery.of(context);
+    final width = mq.size.width;
 
     Widget bottomTitles(double value, TitleMeta meta) {
       return SideTitleWidget(
@@ -50,10 +51,9 @@ class VisitorByMonth extends ConsumerWidget {
       padding: const EdgeInsets.all(10),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const SizedBox(height: 8),
           Text(
             l10n.monthly_visitors.replaceAll('@', (DateTime.now().year - 1).toString()),
             style: style.graphMainTitle,
@@ -67,14 +67,15 @@ class VisitorByMonth extends ConsumerWidget {
           ),
           const SizedBox(height: 14),
           Container(
-            width: 450,
-            height: 250,
+            width: width > 480 ? (width / 2) - 100 : width - 50,
+            height: width > 480 ? (width / 3) - 100 : 200,
             padding: const EdgeInsets.all(12),
             color: theme.cardColor.withOpacity(0.7),
             child: BarChart(BarChartData(
               alignment: BarChartAlignment.center,
               barTouchData: BarTouchData(enabled: false),
-              borderData: FlBorderData(show: true, border: Border.all(width: 2.0, color: theme.colorScheme.outline)),
+              borderData:
+                  FlBorderData(show: true, border: Border.all(width: 2.0, color: Colors.white.withOpacity(0.4))),
               titlesData: FlTitlesData(
                   show: true,
                   topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -97,7 +98,7 @@ class VisitorByMonth extends ConsumerWidget {
                 horizontalInterval: 1,
                 checkToShowHorizontalLine: (value) => value % 2 == 0,
               ),
-              barGroups: _generate(ref),
+              barGroups: _generate(ref, width),
             )),
           )
         ],

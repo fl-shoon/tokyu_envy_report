@@ -32,14 +32,16 @@ class AxisWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final style = Style.of(context);
+    final mq = MediaQuery.of(context);
+    final width = mq.size.width;
+    final dividerPadding = width > 480 ? 20.00 : 35.00;
 
     return Container(
       height: 180,
-      width: 200,
+      width: width > 480 ? 200 : width - 120,
       decoration: BoxDecoration(
-          border: Border.all(width: 1, color: theme.colorScheme.outline), borderRadius: BorderRadius.circular(5)),
+          border: Border.all(width: 2, color: Colors.white.withOpacity(0.4)), borderRadius: BorderRadius.circular(5)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -55,7 +57,7 @@ class AxisWidget extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Container(
-            padding: const EdgeInsetsDirectional.only(start: 20, end: 20),
+            padding: EdgeInsetsDirectional.only(start: dividerPadding, end: dividerPadding),
             child: const Divider(height: 2),
           ),
           const SizedBox(height: 10),

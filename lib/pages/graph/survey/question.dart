@@ -33,7 +33,9 @@ class SurveyQuestionPieChart extends StatelessWidget {
   final List<Visitor> visitors;
   final String title;
   final int questionIndex;
-  const SurveyQuestionPieChart({super.key, required this.visitors, required this.title, required this.questionIndex});
+  final double width;
+  const SurveyQuestionPieChart(
+      {super.key, required this.visitors, required this.title, required this.questionIndex, required this.width});
 
   @override
   Widget build(BuildContext context) {
@@ -46,9 +48,10 @@ class SurveyQuestionPieChart extends StatelessWidget {
     final map = _generate(indexedAnswers);
     final keys = map.keys.toList()..sort();
     final Map<int, int> sortedMap = Map.fromEntries(keys.map((key) => MapEntry(key, map[key] ?? 0)));
+    final radius = width > 480 ? 65.00 : (width - 100) / 4;
 
     return Container(
-      width: 250,
+      width: width - 50,
       margin: const EdgeInsets.all(15.0),
       decoration: BoxDecoration(
           border: Border.all(width: 2.0, color: theme.colorScheme.outline), borderRadius: BorderRadius.circular(5)),
@@ -58,10 +61,10 @@ class SurveyQuestionPieChart extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center, //x
         children: [
           const SizedBox(height: 10),
-          Text(title, style: style.graphMediumTitle, overflow: TextOverflow.fade, softWrap: false),
+          Text(title, style: style.graphMediumTitle),
           const SizedBox(height: 10),
           Container(
-            width: 200,
+            width: width - 100,
             height: 150,
             color: theme.cardColor.withOpacity(0.7),
             child: PieChart(PieChartData(
@@ -70,7 +73,6 @@ class SurveyQuestionPieChart extends StatelessWidget {
                   FlBorderData(show: true, border: Border.all(width: 2.0, color: Colors.white.withOpacity(0.4))),
               centerSpaceRadius: 0,
               sections: List.generate(sortedMap.length, (i) {
-                const radius = 65.0;
                 final value = sortedMap[i] ?? 0;
                 double percentValue = value * (100 / visitors.length);
                 String percentString = percentValue.toStringAsFixed(1);
