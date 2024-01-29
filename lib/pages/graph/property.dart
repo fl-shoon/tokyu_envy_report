@@ -1,17 +1,26 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:tokyu_envy_report/components/survey/property_table.dart';
 import 'package:tokyu_envy_report/etc/style.dart';
 import 'package:tokyu_envy_report/state/state_visitor.dart';
 
-Map<String, int> _generateMap(WidgetRef ref) {
+Map<String, int> _generateMap(WidgetRef ref, DateTime datetime) {
   final Map<String, int> map = {};
+  final List<String> id = [];
 
-  List.filled(12, 1).asMap().forEach((key, value) {
-    final values = ref.watch(visitorHistory(DateTime(DateTime.now().year - 1, key + 1).toIso8601String()));
-    for (var value in values) {
-      if (value.property.isEmpty) continue;
+  final values = ref.read(visitorHistory(datetime.toIso8601String()));
+
+  values.asMap().forEach((key, value) {
+    if (value.property.isEmpty) return;
+    if (key == 0 || id.isEmpty) {
+      id.add(value.id);
+      map[value.property] = 1;
+    } else {
+      if (id.contains(value.id)) return;
+      id.add(value.id);
+
       if (map[value.property] != null) {
         map.update(value.property, (existingValue) => existingValue + 1);
       } else {
@@ -23,8 +32,7 @@ Map<String, int> _generateMap(WidgetRef ref) {
   return map;
 }
 
-List<BarChartGroupData> _generateBarGroups(
-    {required Map<String, int> map, required double width, required ThemeData theme}) {
+List<BarChartGroupData> _generateBarGroups({required Map<String, int> map, required double width}) {
   final List<BarChartGroupData> barGroups = [];
   final setWidth = width > 1000 ? (width / 50) - 5 : width / 50;
 
@@ -43,6 +51,15 @@ List<BarChartGroupData> _generateBarGroups(
   return barGroups;
 }
 
+final _dateTime = StateProvider.autoDispose((ref) => DateTime.now().copyWith(
+      month: DateTime.now().month - 1,
+      day: 1,
+      hour: 0,
+      minute: 0,
+      millisecond: 0,
+      microsecond: 0,
+    ));
+
 class VisitorByProperty extends ConsumerWidget {
   const VisitorByProperty({super.key = const Key('s_visitor_by_property')});
 
@@ -53,21 +70,38 @@ class VisitorByProperty extends ConsumerWidget {
     final mq = MediaQuery.of(context);
     final width = mq.size.width;
 
-    final map = _generateMap(ref);
+    final datetime = ref.watch(_dateTime);
+    final map = _generateMap(ref, datetime);
     final properties = map.keys.toList();
-    final intervalDouble = map.length / 4;
-    final intervalStr = intervalDouble.toStringAsFixed(0);
-    final interval = int.parse(intervalStr);
 
     return Column(children: [
-      Text('来場目的（物件名）', style: style.graphMediumTitle),
-      const SizedBox(height: 10),
-      PropertiesTable(properties: properties),
-      const SizedBox(height: 10),
       Text(
         '来場目的 (人数の割合 vs. 物件名)',
         style: style.graphMainTitle,
       ),
+      const SizedBox(height: 10),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+              onPressed: () {
+                ref.read(_dateTime.notifier).update((state) => state.copyWith(month: state.month - 1));
+              },
+              icon: const Icon(Icons.arrow_back_ios, size: 15)),
+          TextButton(
+              onPressed: () {},
+              child: Text(
+                DateFormat('yyyy-MM').format(datetime),
+                style: theme.textTheme.titleLarge,
+              )),
+          IconButton(
+              onPressed: () {
+                ref.read(_dateTime.notifier).update((state) => state.copyWith(month: state.month + 1));
+              },
+              icon: const Icon(Icons.arrow_forward_ios, size: 15)),
+        ],
+      ),
+      const SizedBox(height: 8),
       Container(
         width: width > 480 ? (width / 2) - 100 : width - 50,
         height: width > 480 ? (width / 3) - 100 : 200,
@@ -81,12 +115,11 @@ class VisitorByProperty extends ConsumerWidget {
               barTouchData: BarTouchData(enabled: false),
               borderData:
                   FlBorderData(show: true, border: Border.all(width: 2.0, color: Colors.white.withOpacity(0.4))),
-              gridData: FlGridData(
+              gridData: const FlGridData(
                 show: true,
                 drawVerticalLine: false,
                 drawHorizontalLine: true,
-                horizontalInterval: interval.toDouble(),
-                checkToShowHorizontalLine: (value) => value % 2 == 0,
+                horizontalInterval: 30,
               ),
               titlesData: FlTitlesData(
                   show: true,
@@ -107,15 +140,16 @@ class VisitorByProperty extends ConsumerWidget {
                   leftTitles: AxisTitles(
                       sideTitles: SideTitles(
                     showTitles: true,
-                    interval: interval.toDouble(),
+                    interval: 30,
                     getTitlesWidget: (value, meta) {
-                      return SideTitleWidget(
-                          axisSide: meta.axisSide, child: Text(meta.formattedValue, style: style.graphTitles));
+                      final title = meta.formattedValue == '100' ? '' : meta.formattedValue;
+                      return SideTitleWidget(axisSide: meta.axisSide, child: Text(title, style: style.graphTitles));
                     },
                   ))),
-              barGroups: _generateBarGroups(map: map, width: width, theme: theme))),
+              barGroups: _generateBarGroups(map: map, width: width))),
         ),
       ),
+      PropertiesTable(properties: properties),
       const SizedBox(height: 10),
     ]);
   }

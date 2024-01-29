@@ -10,11 +10,6 @@ import 'package:tokyu_envy_report/pages/pie/pie.dart';
 import 'package:tokyu_envy_report/state/state_model.dart';
 import 'package:tokyu_envy_report/state/state_visitor.dart';
 
-final _visitors = StateProvider.family.autoDispose((ref, String dt) {
-  final visitors = ref.watch(visitorHistory(dt));
-  return visitors;
-});
-
 bool _surveryCheck(List<Visitor> visitors) {
   if (visitors.isEmpty) return false;
 
@@ -42,8 +37,8 @@ class SRport extends ConsumerWidget {
     final mq = MediaQuery.of(context);
     final width = mq.size.width;
 
-    final todayVisitors = ref.watch(_visitors(DateTime(now.year, now.month, now.day).toIso8601String()));
-    final lastMonthVisitors = ref.watch(_visitors(DateTime(now.year, now.month - 1).toIso8601String()));
+    final todayVisitors = ref.watch(visitorHistory(DateTime(now.year, now.month, now.day).toIso8601String()));
+    final lastMonthVisitors = ref.watch(visitorHistory(DateTime(now.year, now.month - 1).toIso8601String()));
 
     return Scaffold(
       appBar: AppBar(
